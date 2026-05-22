@@ -4,17 +4,37 @@ const curtoBt = document.querySelector(".app__card-button--curto");
 const longoBt = document.querySelector(".app__card-button--longo");
 const banner = document.querySelector(".app__image");
 const titulo = document.querySelector(".app__title");
+const musicaFocoInput = document.querySelector("#alternar-musica");
+const musica = new Audio("/sons/luna-rise-part-one.mp3")   ;
+
+musica.loop = true;
+musicaFocoInput.addEventListener("change", () => {
+  if(musica.paused) {
+    musica.play();
+  } else {
+    musica.pause();
+  }
+})
 
 focoBt.addEventListener("click", () => {
-  alterarContexto("foco");
+  alterarContexto("foco")
+  focoBt.classList.add("active");
+  curtoBt.classList.remove("active");
+  longoBt.classList.remove("active");
 });
 
 curtoBt.addEventListener("click", () => {
   alterarContexto("descanso-curto");
+  curtoBt.classList.add("active");
+  focoBt.classList.remove("active");
+  longoBt.classList.remove("active");
 });
 
 longoBt.addEventListener("click", () => {
   alterarContexto("descanso-longo");
+  longoBt.classList.add("active");
+  focoBt.classList.remove("active");
+  curtoBt.classList.remove("active");
 });
 
 function alterarContexto(contexto) {
