@@ -37,23 +37,26 @@ musicaFocoInput.addEventListener('change', () => {
 
 // Botões de contexto
 focoBt.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = 1500
     alterarContexto('foco')
     focoBt.classList.add('active')
 })
 
 curtoBt.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = 300
     alterarContexto('descanso-curto')
     curtoBt.classList.add('active')
 })
 
 longoBt.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = 900
     alterarContexto('descanso-longo')
     longoBt.classList.add('active')
 })
 
 // Alterar contexto
 function alterarContexto(contexto) {
-
+     mostrarTempo()
     botoes.forEach((botao) => {
         botao.classList.remove('active')
     })
