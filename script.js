@@ -21,7 +21,7 @@ const audioPlay = new Audio('./sons/play.wav')
 const audioPausa = new Audio('./sons/pause.mp3')
 const audioTempoFinalizado = new Audio('./sons/beep.mp3')
 
-let tempoDecorridoEmSegundos = 5
+let tempoDecorridoEmSegundos = 1500
 let intervaloId = null
 
 musica.loop = true
@@ -114,8 +114,7 @@ const contagemRegressiva = () => {
     }
 
     tempoDecorridoEmSegundos--
-
-    console.log('Tempo: ' + tempoDecorridoEmSegundos)
+    mostrarTempo()
 }
 
 // Evento botão iniciar
@@ -155,7 +154,15 @@ function zerar() {
 }
 
 
-function mostrarTempo(){
-    const tempo = tempoDecorridoEmSegundos
-    tempoNaTela.innerHTML
+function mostrarTempo() {
+
+    const minutos = Math.floor(tempoDecorridoEmSegundos / 60)
+    const segundos = tempoDecorridoEmSegundos % 60
+
+    const minutosFormatados = String(minutos).padStart(2, '0')
+    const segundosFormatados = String(segundos).padStart(2, '0')
+
+    tempoNaTela.innerHTML = `${minutosFormatados}:${segundosFormatados}`
 }
+
+mostrarTempo()
