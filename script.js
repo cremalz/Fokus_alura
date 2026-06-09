@@ -75,9 +75,14 @@ function alterarContexto(contexto) {
     }
 }
 
+const alarmeInput = document.querySelector('#alternar-alarme')
+
+
 const contagemRegressiva = () => {
-    if(tempoDecorridoEmSegundos <= 0){
-        audioTempoFinalizado.play()
+    if (tempoDecorridoEmSegundos <= 0) {
+        if (alarmeInput.checked) {        // só toca se estiver ligado
+            audioTempoFinalizado.play()
+        }
         alert('Tempo finalizado!')
         const focoAtivo = html.getAttribute('data-contexto') == 'foco'
         if (focoAtivo) {
@@ -90,7 +95,6 @@ const contagemRegressiva = () => {
     tempoDecorridoEmSegundos -= 1
     mostrarTempo()
 }
-
 startPauseBt.addEventListener('click', iniciarOuPausar)
 
 function iniciarOuPausar() {
