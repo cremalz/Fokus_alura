@@ -2,11 +2,14 @@
 
 const btnAdicionarTarefa = document.querySelector('.app__button--add-task')
 const formAdicionarTarefa = document.querySelector('.app__form-add-task')
+const btnCancelar = document.querySelector('.app__form-footer__button--cancel')
+
 const textarea = document.querySelector('.app__form-textarea')
 const ulTarefas = document.querySelector('.app__section-task-list')
 const paragrafoDescricaoTarefa = document.querySelector('.app__section-active-task-description')
 
 const btnRemoverConcluidas = document.querySelector('#btn-remover-concluidas')
+const btnRemoverTodas = document.querySelector('#btn-remover-todas')
 
 let tarefas = JSON.parse(localStorage.getItem('tarefas')) || []
 let tarefaSelecionada = null
@@ -85,6 +88,8 @@ btnAdicionarTarefa.addEventListener('click', () => {
     formAdicionarTarefa.classList.toggle('hidden')
 })
 
+
+
 formAdicionarTarefa.addEventListener('submit', (evento) => {
     evento.preventDefault();
     const tarefa = {
@@ -94,6 +99,18 @@ formAdicionarTarefa.addEventListener('submit', (evento) => {
     const elementoTarefa = criarElementoTarefa(tarefa)
     ulTarefas.append(elementoTarefa)
     atualizarTarefas()
+    textarea.value = ''
+    formAdicionarTarefa.classList.add('hidden')
+})
+
+btnCancelar.addEventListener('click', () => {
+    textarea.value = ''
+    formAdicionarTarefa.classList.add('hidden')
+})
+
+const btnDeletar = document.querySelector('.app__form-footer__button--delete')
+
+btnDeletar.addEventListener('click', () => {
     textarea.value = ''
     formAdicionarTarefa.classList.add('hidden')
 })
@@ -114,11 +131,14 @@ document.addEventListener('FocoFinalizado', () => {
 })
 
 
-btnRemoverConcluidas.addEventListener('click', () => {
-    const seletor = ".app__section-task-list-item-complete"
+const removerTarefas  = (somenteConcluidas) => {
+    const seletor = somenteConcluidas ? ".app__section-task-list-item-complete" : ".app__section-task-list-item"
     document.querySelectorAll(seletor).forEach(elemento => {
         elemento.remove()
     })
-    tarefas = tarefas.filter(tarefa => !tarefa.completa)
+    tarefas = somenteConcluidas ? tarefas.filter(tarefa => !tarefa.completa) : []
     atualizarTarefas()
-})
+}
+
+btnRemoverConcluidas.addEventListener('click', () => removerTarefas(true))
+btnRemoverTodas.addEventListener('click', () => removerTarefas(false))
