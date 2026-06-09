@@ -1,10 +1,7 @@
-
-
 <div align="center">
   <img width="158" height="40" alt="logo" src="https://github.com/user-attachments/assets/2cb1382e-5191-4189-9cb5-980a11f9e891" />
 
-
-  <h3>Timer Pomodoro com troca de contexto e trilha sonora</h3>
+  <h3>Timer Pomodoro com troca de contexto, trilha sonora e gerenciamento de tarefas</h3>
 
   ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
   ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
@@ -15,7 +12,7 @@
 
 ## ✨ Sobre o Projeto
 
-**Fokus** é um timer de produtividade baseado na técnica **Pomodoro**, com três modos de uso, trilha sonora ambiente e visual imersivo que muda de acordo com o contexto escolhido.
+**Fokus** é um timer de produtividade baseado na técnica **Pomodoro**, com três modos de uso, trilha sonora ambiente, visual imersivo que muda de acordo com o contexto escolhido e um sistema completo de gerenciamento de tarefas com persistência via `localStorage`.
 
 ---
 
@@ -35,6 +32,7 @@
 
 ## ⚙️ Funcionalidades
 
+**Timer**
 - ✅ Timer com contagem regressiva precisa (via `setInterval`)
 - ✅ Três contextos: **Foco**, **Descanso Curto** e **Descanso Longo**
 - ✅ Visual e fundo dinâmicos — mudam conforme o contexto ativo
@@ -43,6 +41,14 @@
 - ✅ Botão **Começar / Pausar** com ícone dinâmico
 - ✅ Alerta ao término do tempo
 - ✅ Design responsivo (desktop, tablet e mobile)
+
+**Gerenciamento de Tarefas**
+- ✅ Criar tarefas com descrição livre
+- ✅ Editar tarefas existentes via `prompt`
+- ✅ Selecionar a tarefa ativa em andamento
+- ✅ Marcar tarefa como concluída automaticamente ao fim de um ciclo de foco
+- ✅ Remover tarefas concluídas ou todas as tarefas
+- ✅ Persistência completa via `localStorage` — tarefas salvas entre sessões
 
 ---
 
@@ -53,6 +59,7 @@ fokus/
 ├── index.html          # Estrutura da aplicação
 ├── styles.css          # Estilos, temas e responsividade
 ├── script.js           # Lógica do timer, contextos e áudio
+├── script-crud.js      # CRUD de tarefas e integração com localStorage
 ├── imagens/
 │   ├── logo.png
 │   ├── foco.png
@@ -61,6 +68,11 @@ fokus/
 │   ├── pattern.png
 │   ├── play_arrow.png
 │   ├── pause.png
+│   ├── edit.png
+│   ├── add_circle.png
+│   ├── check.svg
+│   ├── trash.svg
+│   ├── more.svg
 │   ├── music_note.png
 │   └── favicon.ico
 └── sons/
@@ -111,21 +123,51 @@ banner.setAttribute("src", `./imagens/${contexto}.png`);
 }
 ```
 
-### Timer com Validação de Xeque
+### Timer
 
-O timer usa `setInterval` com intervalo de 1 segundo. Antes de cada movimento, o estado é verificado para evitar mover uma peça que deixaria o próprio rei em xeque. Ao zerar, dispara um beep e exibe um alerta:
+O timer usa `setInterval` com intervalo de 1 segundo. Ao zerar, dispara um beep, exibe um alerta e — se o contexto for **foco** — despacha um evento customizado que marca a tarefa ativa como concluída:
 
 ```js
 const contagemRegressiva = () => {
   if (tempoDecorridoEmSegundos <= 0) {
     audioTempoFinalizado.play();
     alert("Tempo finalizado!");
+    const evento = new CustomEvent("FocoFinalizado");
+    document.dispatchEvent(evento);
     zerar();
     return;
   }
   tempoDecorridoEmSegundos--;
   mostrarTempo();
 };
+```
+
+### Gerenciamento de Tarefas e localStorage
+
+As tarefas são armazenadas como um array de objetos no `localStorage` e reconstruídas no DOM a cada carregamento da página. Cada tarefa possui `descricao` e `completa`:
+
+```js
+let tarefas = JSON.parse(localStorage.getItem("tarefas")) || [];
+
+function atualizarTarefas() {
+  localStorage.setItem("tarefas", JSON.stringify(tarefas));
+}
+```
+
+### Comunicação entre Scripts via Eventos Customizados
+
+A conclusão automática de tarefas é feita através de um `CustomEvent`, desacoplando a lógica do timer da lógica de tarefas:
+
+```js
+// script.js — dispara ao fim do ciclo de foco
+const evento = new CustomEvent("FocoFinalizado");
+document.dispatchEvent(evento);
+
+// script-crud.js — escuta e atualiza a tarefa selecionada
+document.addEventListener("FocoFinalizado", () => {
+  tarefaSelecionada.completa = true;
+  atualizarTarefas();
+});
 ```
 
 ---
@@ -136,7 +178,9 @@ const contagemRegressiva = () => {
 |---|---|
 | HTML5 | Estrutura semântica da aplicação |
 | CSS3 | Variáveis CSS, gradientes dinâmicos, toggle personalizado, responsividade |
-| JavaScript ES6+ | Timer, troca de contexto, controle de áudio |
+| JavaScript ES6+ | Timer, troca de contexto, controle de áudio, CRUD de tarefas |
+| localStorage | Persistência de tarefas entre sessões |
+| CustomEvent API | Comunicação desacoplada entre módulos JS |
 | Google Fonts | Fontes `Unbounded` (timer) e `Montserrat` (interface) |
 | Web Audio API | Reprodução de sons via `new Audio()` |
 
@@ -155,13 +199,17 @@ const contagemRegressiva = () => {
 
 ## 📚 Projeto de Curso
 
-Este projeto foi desenvolvido como parte do curso **[JavaScript: manipulando elementos no DOM](https://cursos.alura.com.br/course/javascript-manipulando-elementos-dom)** da **[Alura](https://www.alura.com.br)**.
+Este projeto foi desenvolvido como parte de dois cursos da **[Alura](https://www.alura.com.br)**:
 
-O objetivo do curso é aprender a manipular elementos HTML diretamente pelo JavaScript, trabalhando com seletores, eventos, atributos e atualização dinâmica da interface — habilidades colocadas em prática neste timer Pomodoro.
+**Curso 1 — Timer e manipulação do DOM**
+> 📖 [JavaScript: manipulando elementos no DOM](https://cursos.alura.com.br/course/javascript-manipulando-elementos-dom)
+> Foco em seletores, eventos, atributos e atualização dinâmica da interface. Resultado: o timer Pomodoro com troca de contexto e trilha sonora.
 
-> 🎓 **Plataforma:** Alura  
-> 📖 **Curso:** JavaScript: manipulando elementos no DOM  
-> 🔗 **Link:** [cursos.alura.com.br/course/javascript-manipulando-elementos-dom](https://cursos.alura.com.br/course/javascript-manipulando-elementos-dom)
+**Curso 2 — CRUD, eventos e localStorage**
+> 📖 [JavaScript: explorando a manipulação de elementos e da localStorage](https://cursos.alura.com.br/course/javascript-manipulacao-elementos-localstorage)
+> Foco em criação e manipulação dinâmica de elementos, persistência de dados com `localStorage`, eventos customizados e comunicação entre módulos. Resultado: o sistema completo de gerenciamento de tarefas integrado ao timer.
+
+> 🎓 **Plataforma:** Alura
 
 ---
 
